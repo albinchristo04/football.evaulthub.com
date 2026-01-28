@@ -66,23 +66,27 @@ const matchSchema = {
       <p class="match-meta">{match.competition} | {match.date} {match.time}</p>
     </div>
 
-    <div class="player-section card">
-      <div class="responsive-iframe-container">
-        <iframe 
-          id="match-player"
-          src={match.channels[0]?.url} 
-          allowfullscreen 
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
+    <div class="player-container-wrapper">
+      <div class="channel-selector-top">
+        <ChannelList channels={match.channels} />
       </div>
-      
-      <div class="notice-bar">
-        <span>🛡️ Recomendamos usar <b>DNS 1.1.1.1</b> o una <b>VPN</b> si el reproductor no carga.</span>
+
+      <div class="player-section card">
+        <div class="responsive-iframe-container">
+          <iframe 
+            id="match-player"
+            src={match.channels[0]?.url} 
+            allowfullscreen 
+            scrolling="no"
+            loading="lazy"
+          ></iframe>
+        </div>
+        
+        <div class="notice-bar">
+          <span>🛡️ Recomendamos usar <b>DNS 1.1.1.1</b> o una <b>VPN</b> si el reproductor no carga.</span>
+        </div>
       </div>
     </div>
-
-    <ChannelList channels={match.channels} />
 
     <ShareButtons matchName={match.title} matchUrl={currentUrl} />
 
@@ -107,6 +111,21 @@ const matchSchema = {
   .match-page-container {
     max-width: 900px;
     margin: 0 auto;
+  }
+
+  .player-container-wrapper {
+    background: #1a1a1a;
+    padding: 1rem;
+    border-radius: var(--radius);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    margin-bottom: 2rem;
+    border: 1px solid #333;
+  }
+
+  .channel-selector-top {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #333;
   }
 
   .match-page-header {
@@ -153,9 +172,10 @@ const matchSchema = {
   }
 
   .player-section {
-    margin-bottom: 2rem;
+    margin-bottom: 0;
     border: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: none;
+    background: #000;
   }
 
   .notice-bar {
