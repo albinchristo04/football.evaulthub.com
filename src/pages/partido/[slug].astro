@@ -42,18 +42,22 @@ export async function getStaticPaths() {
   (d3.events?.streams || []).forEach((category: any) => {
     category.streams.forEach((e: any) => {
       const dateObj = new Date(e.starts_at * 1000);
+      // Use same slug pattern as embed page
+      const serverSlug = slugify(`${category.category}-${e.name}`);
       allEvents.push({
         title: e.name,
         competition: category.category,
         date: dateObj.toLocaleDateString('es-ES'),
         time: dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-        channels: [{ name: e.tag || 'Default', url: e.iframe }]
+        channels: [{ name: e.tag || 'Default', url: e.iframe }],
+        serverSlug: serverSlug
       });
     });
   });
 
   return allEvents.map((match: any) => {
-    const matchSlug = slugify(`${match.competition}-${match.title}`);
+    // Use serverSlug if available (Server 3), otherwise generate from competition-title
+    const matchSlug = match.serverSlug || slugify(`${match.competition}-${match.title}`);
     return {
       params: { slug: matchSlug },
       props: { match, matchSlug }

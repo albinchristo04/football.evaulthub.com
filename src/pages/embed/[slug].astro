@@ -37,11 +37,13 @@ export async function getStaticPaths() {
   const d3 = await res3.json();
   (d3.events?.streams || []).forEach((category: any) => {
     category.streams.forEach((e: any) => {
-      const matchSlug = slugify(`${category.category}-${e.name}`);
-      paths.push({
-        params: { slug: `${matchSlug}-ch1` },
-        props: { url: e.iframe, server: 'Server 3' }
-      });
+      if (e.iframe) { // Only add if iframe URL exists
+        const matchSlug = slugify(`${category.category}-${e.name}`);
+        paths.push({
+          params: { slug: `${matchSlug}-ch1` },
+          props: { url: e.iframe, server: 'Server 3' }
+        });
+      }
     });
   });
 
@@ -49,6 +51,7 @@ export async function getStaticPaths() {
 }
 
 const { url, server } = Astro.props;
+const iframeUrl = url || '';
 ---
 
 <!DOCTYPE html>
@@ -71,6 +74,12 @@ const { url, server } = Astro.props;
             height: 100%;
             border: none;
         }
+        .error-msg {
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+            font-family: sans-serif;
+        }
     </style>
     <!-- Sandbox for Server 2 to block source popups -->
     {server === 'Server 2' ? (
@@ -83,11 +92,15 @@ const { url, server } = Astro.props;
     <script src="https://pl26869306.effectivegatecpm.com/22/9f/cc/229fcc7fac3be2c689fa4fa174ce4169.js"></script>
 </head>
 <body>
-    <iframe 
-        src={url} 
-        allowfullscreen 
-        scrolling="no"
-        sandbox={server === 'Server 2' ? "allow-scripts allow-same-origin allow-forms allow-presentation" : undefined}
-    ></iframe>
+    {iframeUrl ? (
+      <iframe 
+          src={iframeUrl} 
+          allowfullscreen 
+          scrolling="no"
+          sandbox={server === 'Server 2' ? "allow-scripts allow-same-origin allow-forms allow-presentation" : undefined}
+      ></iframe>
+    ) : (
+      <div class="error-msg">Stream no disponible</div>
+    )}
 </body>
 </html>
