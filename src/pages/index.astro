@@ -11,6 +11,10 @@ const response2 = await fetch('https://raw.githubusercontent.com/albinchristo04/
 const data2 = await response2.json();
 const events2Raw = data2.events || {};
 
+const response3 = await fetch('https://raw.githubusercontent.com/albinchristo04/ptv/refs/heads/main/events_with_m3u8.json');
+const data3 = await response3.json();
+const events3Raw = data3.events?.streams || [];
+
 // Transform Server 1
 const transformedMatches1 = events1.map((event: any) => ({
   title: event.description,
@@ -42,7 +46,29 @@ Object.entries(events2Raw).forEach(([day, events]: [string, any]) => {
   });
 });
 
-const allMatches = [...transformedMatches1, ...transformedMatches2];
+// Transform Server 3
+const transformedMatches3: any[] = [];
+events3Raw.forEach((category: any) => {
+  category.streams.forEach((event: any) => {
+    const dateObj = new Date(event.starts_at * 1000);
+    const dateStr = dateObj.toLocaleDateString('es-ES');
+    const timeStr = dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    
+    transformedMatches3.push({
+      title: event.name,
+      competition: category.category,
+      date: dateStr,
+      time: timeStr,
+      server: 'Server 3',
+      channels: [{
+        name: event.tag || 'Default',
+        url: event.iframe
+      }]
+    });
+  });
+});
+
+const allMatches = [...transformedMatches1, ...transformedMatches2, ...transformedMatches3];
 
 const groupedMatches = allMatches.reduce((acc: any, match: any) => {
   const date = match.date;
@@ -69,6 +95,7 @@ const sortedDates = Object.keys(groupedMatches).sort((a, b) => {
   <div class="server-tabs">
     <button class="tab-btn active" data-server="Server 1">Servidor 1</button>
     <button class="tab-btn" data-server="Server 2">Servidor 2</button>
+    <button class="tab-btn" data-server="Server 3">Servidor 3</button>
   </div>
   
   <div class="match-list">

@@ -36,6 +36,22 @@ export async function getStaticPaths() {
     });
   });
 
+  // Fetch Server 3
+  const res3 = await fetch('https://raw.githubusercontent.com/albinchristo04/ptv/refs/heads/main/events_with_m3u8.json');
+  const d3 = await res3.json();
+  (d3.events?.streams || []).forEach((category: any) => {
+    category.streams.forEach((e: any) => {
+      const dateObj = new Date(e.starts_at * 1000);
+      allEvents.push({
+        title: e.name,
+        competition: category.category,
+        date: dateObj.toLocaleDateString('es-ES'),
+        time: dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        channels: [{ name: e.tag || 'Default', url: e.iframe }]
+      });
+    });
+  });
+
   return allEvents.map((match: any) => {
     const slug = slugify(`${match.competition}-${match.title}`);
     return {
