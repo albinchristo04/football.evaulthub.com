@@ -1,0 +1,124 @@
+---
+import { slugify } from '../utils/slugify';
+
+interface Props {
+  match: {
+    title: string;
+    competition: string;
+    time: string;
+    channels: { name: string; url: string; }[];
+  };
+}
+
+const { match } = Astro.props;
+const slug = slugify(`${match.competition}-${match.title}`);
+---
+
+<div class="match-card card">
+  <div class="match-header">
+    <span class="match-time">{match.time}</span>
+    <span class="match-icon">⚽</span>
+    <span class="match-name">{match.title}</span>
+    <span class="expand-indicator">VER CANALES »</span>
+  </div>
+  <div class="match-content" style="display: none;">
+    <p class="competition-label">{match.competition}</p>
+    <div class="channel-grid">
+      {match.channels.map(channel => (
+        <a href={`/partido/${slug}/`} class="btn channel-link">
+          {channel.name}
+        </a>
+      ))}
+    </div>
+    <div class="match-page-link">
+      <a href={`/partido/${slug}/`}>PÁGINA DEL PARTIDO</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .match-card {
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+  }
+
+  .match-header {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    gap: 10px;
+    background: #fdfdfd;
+  }
+
+  .match-time {
+    font-weight: bold;
+    color: var(--primary-red);
+    min-width: 50px;
+  }
+
+  .match-name {
+    flex-grow: 1;
+    font-weight: 600;
+  }
+
+  .expand-indicator {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  .match-content {
+    padding: 1rem;
+    background: #fff;
+    border-top: 1px solid #eee;
+  }
+
+  .competition-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .channel-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .channel-link {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .match-page-link {
+    text-align: right;
+  }
+
+  .match-page-link a {
+    font-size: 0.8rem;
+    color: var(--primary-red);
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  .match-card.open .expand-indicator {
+    transform: rotate(90deg);
+  }
+</style>
+
+<script>
+  const cards = document.querySelectorAll('.match-card');
+  cards.forEach(card => {
+    const header = card.querySelector('.match-header');
+    const content = card.querySelector('.match-content') as HTMLElement;
+    
+    header?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = content.style.display === 'block';
+      content.style.display = isOpen ? 'none' : 'block';
+      card.classList.toggle('open', !isOpen);
+    });
+  });
+</script>

@@ -1,0 +1,89 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogType?: string;
+  ogImage?: string;
+  matchSchema?: any;
+}
+
+const { 
+  title, 
+  description = "Mira deportes en vivo, fútbol, baloncesto y más en football.evaulthub.com. Streamings gratuitos de alta calidad.",
+  ogType = "website",
+  ogImage = "/favicon.ico",
+  matchSchema
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO -->
+    <title>{title} | football.evaulthub.com</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(ogImage, Astro.site)} />
+
+    {matchSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(matchSchema)} />
+    )}
+    
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": Astro.site
+        }
+      ]
+    })} />
+  </head>
+  <body>
+    <header>
+      <a href="/">
+        <h1>football.evaulthub.com</h1>
+      </a>
+    </header>
+    <nav class="categories">
+      <div class="container">
+        <a href="/">Fútbol</a>
+        <a href="/">Baloncesto</a>
+        <a href="/">Tenis</a>
+        <a href="/">MotoGP</a>
+        <a href="/">F1</a>
+      </div>
+    </nav>
+    <main>
+      <slot />
+    </main>
+    <footer style="text-align: center; padding: 2rem; color: #666; font-size: 0.8rem;">
+      <p>&copy; {new Date().getFullYear()} football.evaulthub.com - Agenda deportiva en vivo</p>
+    </footer>
+  </body>
+</html>

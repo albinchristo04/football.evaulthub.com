@@ -1,0 +1,71 @@
+---
+interface Channel {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  channels: Channel[];
+}
+
+const { channels } = Astro.props;
+---
+
+<div class="channel-selector">
+  <h3>Seleccionar Canal</h3>
+  <div class="channel-buttons">
+    {channels.map((channel, index) => (
+      <button 
+        class={`btn channel-btn ${index === 0 ? 'active' : ''}`} 
+        data-url={channel.url}
+      >
+        {channel.name}
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .channel-selector {
+    margin: 1rem 0;
+  }
+  
+  .channel-selector h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .channel-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .channel-btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    background-color: #444;
+  }
+
+  .channel-btn.active {
+    background-color: var(--primary-red);
+  }
+</style>
+
+<script>
+  const buttons = document.querySelectorAll('.channel-btn');
+  const iframe = document.getElementById('match-player') as HTMLIFrameElement;
+
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const url = button.getAttribute('data-url');
+      if (url && iframe) {
+        iframe.src = url;
+        
+        // Update active state
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+      }
+    });
+  });
+</script>

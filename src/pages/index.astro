@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MatchCard from '../components/MatchCard.astro';
+
+const response = await fetch('https://raw.githubusercontent.com/albinchristo04/blogger-autopost/refs/heads/main/rojadirecta_events.json');
+const data = await response.json();
+
+// Transform data to group channels by match
+const matchesMap = new Map();
+
+data.forEach((entry: any) => {
+  const key = `${entry.competition}-${entry.title}-${entry.date}-${entry.time}`;
+  if (!matchesMap.has(key)) {
+    matchesMap.set(key, {
+      title: entry.title,
+      competition: entry.competition,
+      date: entry.date,
+      time: entry.time,
+      channels: []
+    });
+  }
+  matchesMap.get(key).channels.push({
+    name: entry.channel_name,
+    url: entry.decoded_url
+  });
+});
+
+const groupedMatches = Array.from(matchesMap.values()).reduce((acc, match) => {
+  const date = match.date;
+  if (!acc[date]) {
+    acc[date] = [];
+  }
+  acc[date].push(match);
+  return acc;
+}, {} as any);
+
+const sortedDates = Object.keys(groupedMatches).sort((a, b) => {
+  // Assuming DD/MM/YYYY format based on standard Rojadirecta data
+  const [dayA, monthA, yearA] = a.split('/').map(Number);
+  const [dayB, monthB, yearB] = b.split('/').map(Number);
+  return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
+});
+---
+
+<BaseLayout title="Inicio">
+  <div class="container">
+    <h2 class="section-title">PROGRAMACIÓN DE HOY EN VIVO</h2>
+    
+    <div class="match-list">
+      {sortedDates.map(date => (
+        <div class="date-group">
+          <div class="date-header">{date}</div>
+          {groupedMatches[date].map((match: any) => (
+            <MatchCard match={match} />
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .date-header {
+    background: #333;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 1rem 0 0.5rem 0;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+</style>

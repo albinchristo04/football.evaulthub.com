@@ -1,0 +1,199 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ChannelList from '../../components/ChannelList.astro';
+import ShareButtons from '../../components/ShareButtons.astro';
+import { slugify } from '../../utils/slugify';
+
+export async function getStaticPaths() {
+  const response = await fetch('https://raw.githubusercontent.com/albinchristo04/blogger-autopost/refs/heads/main/rojadirecta_events.json');
+  const data = await response.json();
+
+  const matchesMap = new Map();
+
+  data.forEach((entry: any) => {
+    const key = `${entry.competition}-${entry.title}-${entry.date}-${entry.time}`;
+    if (!matchesMap.has(key)) {
+      matchesMap.set(key, {
+        title: entry.title,
+        competition: entry.competition,
+        date: entry.date,
+        time: entry.time,
+        channels: []
+      });
+    }
+    matchesMap.get(key).channels.push({
+      name: entry.channel_name,
+      url: entry.decoded_url
+    });
+  });
+
+  return Array.from(matchesMap.values()).map(match => {
+    const slug = slugify(`${match.competition}-${match.title}`);
+    return {
+      params: { slug },
+      props: { match }
+    };
+  });
+}
+
+const { match } = Astro.props;
+const currentUrl = `https://football.evaulthub.com/partido/${slugify(`${match.competition}-${match.title}`)}/`;
+
+const matchSchema = {
+  "@context": "https://schema.org",
+  "@type": "SportsEvent",
+  "name": match.title,
+  "description": `Ver ${match.title} en vivo - ${match.competition}`,
+  "startDate": match.date, // Note: Schema prefers ISO format, but keeping as is for simplicity
+  "homeTeam": {
+    "@type": "SportsTeam",
+    "name": match.title.split(' vs ')[0] || match.title
+  },
+  "awayTeam": {
+    "@type": "SportsTeam",
+    "name": match.title.split(' vs ')[1] || ""
+  },
+  "location": {
+    "@type": "Place",
+    "name": match.competition
+  }
+};
+---
+
+<BaseLayout 
+  title={`${match.title} en vivo`} 
+  description={`Ver ${match.title} en vivo gratis. Stream online de ${match.competition}. Disfruta del partido sin cortes.`}
+  matchSchema={matchSchema}
+>
+  <div class="container">
+    <div class="match-page-header">
+      <h2 class="match-title">
+        <span class="live-indicator">EN VIVO</span> 
+        {match.title}
+      </h2>
+      <p class="match-meta">{match.competition} | {match.date} {match.time}</p>
+    </div>
+
+    <div class="player-section card">
+      <div class="responsive-iframe-container">
+        <iframe 
+          id="match-player"
+          src={match.channels[0]?.url} 
+          allowfullscreen 
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      </div>
+      
+      <div class="notice-bar">
+        <span>🛡️ Recomendamos usar <b>DNS 1.1.1.1</b> o una <b>VPN</b> si el reproductor no carga.</span>
+      </div>
+    </div>
+
+    <ChannelList channels={match.channels} />
+
+    <ShareButtons matchName={match.title} matchUrl={currentUrl} />
+
+    <div class="seo-content card">
+      <h3>¿Cómo ver {match.title} online?</h3>
+      <p>
+        Puedes ver el partido <strong>{match.title}</strong> de la <strong>{match.competition}</strong> 
+        totalmente gratis a través de nuestros canales de streaming. Solo selecciona uno de los canales 
+        disponibles arriba y disfruta de la mejor calidad.
+      </p>
+      <div class="embed-code">
+        <label>Código para insertar:</label>
+        <textarea readonly>{`<iframe src="${currentUrl}" width="100%" height="500" frameborder="0"></iframe>`}</textarea>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .match-page-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .match-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .live-indicator {
+    background: var(--primary-red);
+    color: white;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 10px;
+    animation: blink 1.5s infinite;
+  }
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  .match-meta {
+    color: #aaa;
+    font-size: 1.1rem;
+  }
+
+  .player-section {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .notice-bar {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+    text-align: center;
+    border-top: 1px solid #ffeeba;
+  }
+
+  .seo-content {
+    padding: 1.5rem;
+    color: #333;
+    margin-top: 2rem;
+  }
+
+  .seo-content h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-red);
+  }
+
+  .embed-code {
+    margin-top: 1.5rem;
+  }
+
+  .embed-code label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  .embed-code textarea {
+    width: 100%;
+    height: 60px;
+    padding: 10px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    resize: none;
+  }
+
+  @media (max-width: 600px) {
+    .match-title {
+      font-size: 1.4rem;
+    }
+  }
+</style>
