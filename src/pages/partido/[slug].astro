@@ -53,16 +53,17 @@ export async function getStaticPaths() {
   });
 
   return allEvents.map((match: any) => {
-    const slug = slugify(`${match.competition}-${match.title}`);
+    const matchSlug = slugify(`${match.competition}-${match.title}`);
     return {
-      params: { slug },
-      props: { match }
+      params: { slug: matchSlug },
+      props: { match, matchSlug }
     };
   });
 }
 
-const { match } = Astro.props;
-const currentUrl = `https://football.evaulthub.com/partido/${slugify(`${match.competition}-${match.title}`)}/`;
+const { match, matchSlug } = Astro.props;
+const currentUrl = `https://football.evaulthub.com/partido/${matchSlug}/`;
+const embedUrl = `https://football.evaulthub.com/embed/${matchSlug}/`;
 
 const matchSchema = {
   "@context": "https://schema.org",
@@ -141,7 +142,7 @@ const matchSchema = {
       <div class="embed-code">
         <label>Código para insertar:</label>
         <div class="textarea-wrapper">
-          <textarea readonly>{`<iframe src="${currentUrl}" width="100%" height="500" frameborder="0"></iframe>`}</textarea>
+          <textarea readonly>{`<iframe src="${embedUrl}" width="100%" height="500" frameborder="0"></iframe>`}</textarea>
         </div>
       </div>
     </div>
