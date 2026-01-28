@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ChannelList from '../../components/ChannelList.astro';
 import ShareButtons from '../../components/ShareButtons.astro';
+import AdUnit from '../../components/AdUnit.astro';
 import { slugify } from '../../utils/slugify';
 
 export async function getStaticPaths() {
@@ -58,6 +59,8 @@ const matchSchema = {
   matchSchema={matchSchema}
 >
   <div class="match-page-container">
+    <AdUnit type="leaderboard" />
+
     <div class="match-page-header">
       <h2 class="match-title">
         <span class="live-indicator">EN VIVO</span> 
@@ -65,6 +68,8 @@ const matchSchema = {
       </h2>
       <p class="match-meta">{match.competition} | {match.date} {match.time}</p>
     </div>
+
+    <AdUnit type="mobile" />
 
     <div class="player-container-wrapper">
       <div class="channel-selector-top">
@@ -88,7 +93,11 @@ const matchSchema = {
       </div>
     </div>
 
+    <AdUnit type="small" />
+
     <ShareButtons matchName={match.title} matchUrl={currentUrl} />
+
+    <AdUnit type="square" />
 
     <div class="seo-content card">
       <h3>¿Cómo ver {match.title} online?</h3>
