@@ -180,6 +180,9 @@ const matchSchema = {
         // Update active state
         buttons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
+
+        // Optional: Trigger ad refresh if global function exists
+        if (window.initAds) window.initAds();
       });
     });
   }

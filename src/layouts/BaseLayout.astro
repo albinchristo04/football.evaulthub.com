@@ -67,6 +67,22 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7025462814384100" crossorigin="anonymous"></script>
+    <script is:inline>
+      window.initAds = function() {
+        try {
+          const ads = document.querySelectorAll('.adsbygoogle:not([data-adsbygoogle-status])');
+          ads.forEach(() => {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          });
+        } catch (e) {
+          console.error("AdSense Error:", e);
+        }
+      };
+
+      // Initialize on load and after Astro navigation
+      document.addEventListener('DOMContentLoaded', window.initAds);
+      document.addEventListener('astro:after-swap', window.initAds);
+    </script>
 
     <!-- Popup Ad -->
     <script src="https://pl26869306.effectivegatecpm.com/22/9f/cc/229fcc7fac3be2c689fa4fa174ce4169.js"></script>
