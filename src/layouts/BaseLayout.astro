@@ -14,7 +14,8 @@ const {
   description = "Mira deportes en vivo, fútbol, baloncesto y más en football.evaulthub.com. Streamings gratuitos de alta calidad.",
   ogType = "website",
   ogImage = "/favicon.ico",
-  matchSchema
+  matchSchema,
+  matchSlug
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -70,7 +71,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <!-- Popup Ad -->
     <script src="https://pl26869306.effectivegatecpm.com/22/9f/cc/229fcc7fac3be2c689fa4fa174ce4169.js"></script>
   </head>
-  <body>
+  <body data-match-slug={matchSlug}>
     <header>
       <div class="header-container">
         <a href="/" class="logo">

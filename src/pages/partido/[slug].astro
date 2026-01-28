@@ -90,6 +90,7 @@ const matchSchema = {
   title={`${match.title} en vivo`} 
   description={`Ver ${match.title} en vivo gratis. Stream online de ${match.competition}. Disfruta del partido sin cortes.`}
   matchSchema={matchSchema}
+  matchSlug={matchSlug}
 >
   <div class="match-page-container">
     <AdUnit type="leaderboard" />
@@ -106,14 +107,27 @@ const matchSchema = {
 
     <div class="player-container-wrapper">
       <div class="channel-selector-top">
-        <ChannelList channels={match.channels} />
+        <div class="channel-selector">
+          <div class="channel-buttons">
+            {match.channels.map((channel: any, index: number) => (
+              <button 
+                class={`btn channel-btn ${index === 0 ? 'active' : ''}`} 
+                data-url={channel.url}
+                data-index={index + 1}
+              >
+                <span>OPCIÓN</span> {index + 1} - {channel.name}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div class="player-section card">
         <div class="responsive-iframe-container">
           <iframe 
             id="match-player"
-            src={match.channels[0]?.url} 
+            name="match-player-iframe"
+            src={`/embed/${matchSlug}-ch1/`} 
             allowfullscreen 
             scrolling="no"
             loading="lazy"
@@ -149,7 +163,74 @@ const matchSchema = {
   </div>
 </BaseLayout>
 
-<style>
+<script>
+  function setupChannelButtons() {
+    const buttons = document.querySelectorAll('.channel-btn');
+    const iframe = document.getElementById('match-player') as HTMLIFrameElement;
+
+    if (!iframe) return;
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const channelIndex = button.getAttribute('data-index');
+        const matchSlug = document.body.getAttribute('data-match-slug');
+        
+        iframe.src = `/embed/${matchSlug}-ch${channelIndex}/`;
+        
+        // Update active state
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+      });
+    });
+  }
+
+  // Run on page load
+  setupChannelButtons();
+
+  // Run on view transitions if enabled
+  document.addEventListener('astro:after-swap', setupChannelButtons);
+</script>
+    margin: 0;
+  }
+  
+  .channel-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .channel-btn {
+    font-size: 0.75rem;
+    padding: 0.6rem 1rem;
+    background-color: #333;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+
+  .channel-btn span {
+    color: var(--primary-red);
+    font-weight: 900;
+  }
+
+  .channel-btn:hover {
+    background-color: #444;
+    border-color: var(--primary-red);
+    transform: translateY(-2px);
+  }
+
+  .channel-btn.active {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+  }
+
+  .channel-btn.active span {
+    color: white;
+  }
+
   .match-page-container {
     max-width: 900px;
     margin: 0 auto;

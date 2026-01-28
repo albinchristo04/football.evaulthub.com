@@ -17,6 +17,7 @@ const { channels } = Astro.props;
       <button 
         class={`btn channel-btn ${index === 0 ? 'active' : ''}`} 
         data-url={channel.url}
+        data-index={index + 1}
       >
         <span>OPCIÓN</span> {index + 1} - {channel.name}
       </button>
@@ -78,8 +79,11 @@ const { channels } = Astro.props;
     buttons.forEach(button => {
       button.addEventListener('click', () => {
         const url = button.getAttribute('data-url');
-        if (url) {
-          iframe.src = url;
+        const channelIndex = button.getAttribute('data-index');
+        const matchSlug = document.body.getAttribute('data-match-slug');
+        
+        if (iframe) {
+          iframe.src = `/embed/${matchSlug}-ch${channelIndex}/`;
           
           // Update active state
           buttons.forEach(btn => btn.classList.remove('active'));

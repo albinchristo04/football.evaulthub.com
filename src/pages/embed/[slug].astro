@@ -2,16 +2,18 @@
 import { slugify } from '../../utils/slugify';
 
 export async function getStaticPaths() {
-  const allEvents: any[] = [];
+  const paths = [];
   
   // Fetch Server 1
   const res1 = await fetch('https://raw.githubusercontent.com/albinchristo04/blogger-autopost/refs/heads/main/rojadirecta_events.json');
   const d1 = await res1.json();
   (d1.events || []).forEach((e: any) => {
-    allEvents.push({
-      competition: e.country,
-      title: e.description,
-      url: e.channels[0]?.decoded_url
+    const matchSlug = slugify(`${e.country}-${e.description}`);
+    e.channels.forEach((ch: any, index: number) => {
+      paths.push({
+        params: { slug: `${matchSlug}-ch${index + 1}` },
+        props: { url: ch.decoded_url, server: 'Server 1' }
+      });
     });
   });
 
@@ -20,10 +22,12 @@ export async function getStaticPaths() {
   const d2 = await res2.json();
   Object.entries(d2.events || {}).forEach(([day, events]: [string, any]) => {
     events.forEach((e: any) => {
-      allEvents.push({
-        competition: 'Sports',
-        title: e.event,
-        url: e.streams[0]
+      const matchSlug = slugify(`Sports-${e.event}`);
+      e.streams.forEach((url: string, index: number) => {
+        paths.push({
+          params: { slug: `${matchSlug}-ch${index + 1}` },
+          props: { url: url, server: 'Server 2' }
+        });
       });
     });
   });
@@ -33,24 +37,18 @@ export async function getStaticPaths() {
   const d3 = await res3.json();
   (d3.events?.streams || []).forEach((category: any) => {
     category.streams.forEach((e: any) => {
-      allEvents.push({
-        competition: category.category,
-        title: e.name,
-        url: e.iframe
+      const matchSlug = slugify(`${category.category}-${e.name}`);
+      paths.push({
+        params: { slug: matchSlug },
+        props: { url: e.iframe, server: 'Server 3' }
       });
     });
   });
 
-  return allEvents.map((match: any) => {
-    const slug = slugify(`${match.competition}-${match.title}`);
-    return {
-      params: { slug },
-      props: { url: match.url }
-    };
-  });
+  return paths;
 }
 
-const { url } = Astro.props;
+const { url, server } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -74,7 +72,14 @@ const { url } = Astro.props;
             border: none;
         }
     </style>
-    <!-- Popup Ad -->
+    <!-- Sandbox for Server 2 to block source popups -->
+    {server === 'Server 2' ? (
+      <script is:inline>
+        window.open = function() { return null; };
+      </script>
+    ) : null}
+    
+    <!-- Our Popup Ad -->
     <script src="https://pl26869306.effectivegatecpm.com/22/9f/cc/229fcc7fac3be2c689fa4fa174ce4169.js"></script>
 </head>
 <body>
@@ -82,6 +87,7 @@ const { url } = Astro.props;
         src={url} 
         allowfullscreen 
         scrolling="no"
+        sandbox={server === 'Server 2' ? "allow-scripts allow-same-origin allow-forms allow-presentation" : undefined}
     ></iframe>
 </body>
 </html>
