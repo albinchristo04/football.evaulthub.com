@@ -67,8 +67,7 @@ const sortedDates = Object.keys(groupedMatches).sort((a, b) => {
   </div>
   
   <div class="server-tabs">
-    <button class="tab-btn active" data-server="all">Todos</button>
-    <button class="tab-btn" data-server="Server 1">Servidor 1</button>
+    <button class="tab-btn active" data-server="Server 1">Servidor 1</button>
     <button class="tab-btn" data-server="Server 2">Servidor 2</button>
   </div>
   
@@ -172,27 +171,34 @@ const sortedDates = Object.keys(groupedMatches).sort((a, b) => {
         buttons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        // Filter cards
-        cards.forEach(card => {
-          const cardServer = card.getAttribute('data-server');
-          if (server === 'all' || cardServer === server) {
-            (card as HTMLElement).style.display = 'block';
-          } else {
-            (card as HTMLElement).style.display = 'none';
-          }
-        });
-
-        // Hide empty date groups
-        dateGroups.forEach(group => {
-          const visibleCards = group.querySelectorAll('.match-card-wrapper[style="display: block;"]');
-          if (visibleCards.length === 0 && server !== 'all') {
-             (group as HTMLElement).style.display = 'none';
-          } else {
-             (group as HTMLElement).style.display = 'block';
-          }
-        });
+        filterMatches(server);
       });
     });
+
+    function filterMatches(server) {
+      // Filter cards
+      cards.forEach(card => {
+        const cardServer = card.getAttribute('data-server');
+        if (cardServer === server) {
+          (card as HTMLElement).style.display = 'block';
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+
+      // Hide empty date groups
+      dateGroups.forEach(group => {
+        const visibleCards = group.querySelectorAll('.match-card-wrapper[style="display: block;"]');
+        if (visibleCards.length === 0) {
+           (group as HTMLElement).style.display = 'none';
+        } else {
+           (group as HTMLElement).style.display = 'block';
+        }
+      });
+    }
+
+    // Initial filter for Server 1
+    filterMatches('Server 1');
   }
 
   setupServerTabs();
