@@ -1,0 +1,185 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { slugify } from '../utils/slugify';
+
+// Fetch all matches to generate share content
+const allMatches: any[] = [];
+
+// Fetch Server 1
+const res1 = await fetch('https://raw.githubusercontent.com/albinchristo04/blogger-autopost/refs/heads/main/rojadirecta_events.json');
+const d1 = await res1.json();
+(d1.events || []).forEach((e: any) => {
+  allMatches.push({
+    title: e.description,
+    time: e.time,
+    date: e.date,
+    server: 'Server 1',
+    slug: slugify(`${e.country}-${e.description}`)
+  });
+});
+
+// Fetch Server 2
+const res2 = await fetch('https://raw.githubusercontent.com/albinchristo04/mayiru/refs/heads/main/sports_events.json');
+const d2 = await res2.json();
+Object.entries(d2.events || {}).forEach(([day, events]: [string, any]) => {
+  events.forEach((e: any) => {
+    allMatches.push({
+      title: e.event,
+      time: e.time,
+      date: day,
+      server: 'Server 2',
+      slug: slugify(`Sports-${e.event}`)
+    });
+  });
+});
+
+// Fetch Server 3
+const res3 = await fetch('https://raw.githubusercontent.com/albinchristo04/ptv/refs/heads/main/events_with_m3u8.json');
+const d3 = await res3.json();
+(d3.events?.streams || []).forEach((category: any) => {
+  category.streams.forEach((e: any) => {
+    const dateObj = new Date(e.starts_at * 1000);
+    allMatches.push({
+      title: e.name,
+      time: dateObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      date: dateObj.toLocaleDateString('es-ES'),
+      server: 'Server 3',
+      slug: slugify(`${category.category}-${e.name}`)
+    });
+  });
+});
+
+const groupedByServer = {
+  'Server 1': allMatches.filter(m => m.server === 'Server 1'),
+  'Server 2': allMatches.filter(m => m.server === 'Server 2'),
+  'Server 3': allMatches.filter(m => m.server === 'Server 3'),
+};
+---
+
+<BaseLayout title="Generador de Share">
+  <div class="share-generator-container">
+    <div class="page-title-bar">
+      <span>🔗</span> GENERADOR DE ENLACES PARA TELEGRAM
+    </div>
+
+    <div class="server-selection">
+      {Object.keys(groupedByServer).map(server => (
+        <div class="server-block">
+          <h2 class="server-header">{server}</h2>
+          <div class="match-grid">
+            {groupedByServer[server].map(match => (
+              <div class="share-card card">
+                <div class="match-info">
+                  <span class="match-time">{match.time}</span>
+                  <span class="match-title">{match.title}</span>
+                </div>
+                <div class="share-actions">
+                  <button 
+                    class="btn btn-copy" 
+                    data-text={`⚽ VER EN VIVO:
+${match.title}
+
+⏰ Horario: ${match.time}
+
+📺 Mira el partido aquí 👇
+https://football.evaulthub.com/partido/${match.slug}/`}
+                  >
+                    COPIAR PARA TELEGRAM
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .share-generator-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .server-header {
+    background: var(--primary-red);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 2rem 0 1rem 0;
+    border-radius: var(--radius);
+    text-transform: uppercase;
+  }
+
+  .match-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .share-card {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid #eee;
+  }
+
+  .match-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .match-time {
+    color: var(--primary-red);
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  .match-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+  }
+
+  .btn-copy {
+    width: 100%;
+    font-size: 0.75rem;
+    padding: 0.6rem;
+  }
+
+  @media (max-width: 600px) {
+    .match-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function setupCopyButtons() {
+    const buttons = document.querySelectorAll('.btn-copy');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const text = button.getAttribute('data-text');
+        if (text) {
+          navigator.clipboard.writeText(text).then(() => {
+            const originalText = button.textContent;
+            button.textContent = '✅ ¡COPIADO!';
+            button.classList.add('success');
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.classList.remove('success');
+            }, 2000);
+          });
+        }
+      });
+    });
+  }
+
+  setupCopyButtons();
+  document.addEventListener('astro:after-swap', setupCopyButtons);
+</script>
