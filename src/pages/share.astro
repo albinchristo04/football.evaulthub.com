@@ -71,13 +71,9 @@ const groupedByServer = {
     <div class="server-content">
       {Object.keys(groupedByServer).map((server, sIdx) => {
         const serverMatches = groupedByServer[server];
-        const shareText = `🚀 PROGRAMACIÓN DE HOY - ${server}\n\n` + 
-          serverMatches.map(m => `⚽ ${m.title}
-⏰ ${m.time}
-📺 https://football.evaulthub.com/partido/${m.slug}/
------------------------`).join('
-
-');
+        const shareLines = serverMatches.map(m => `⚽ ${m.title}\n⏰ ${m.time}\n📺 https://football.evaulthub.com/partido/${m.slug}/\n-----------------------`);
+        const header = `🚀 PROGRAMACIÓN DE HOY - ${server}\n\n`;
+        const shareText = header + shareLines.join('\n\n');
         
         return (
           <div class="server-block" data-server={server} style={sIdx === 0 ? 'display: block;' : 'display: none;'}>
