@@ -39,7 +39,7 @@ export async function getStaticPaths() {
     category.streams.forEach((e: any) => {
       const matchSlug = slugify(`${category.category}-${e.name}`);
       paths.push({
-        params: { slug: matchSlug },
+        params: { slug: `${matchSlug}-ch1` },
         props: { url: e.iframe, server: 'Server 3' }
       });
     });
