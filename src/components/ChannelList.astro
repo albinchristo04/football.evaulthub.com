@@ -69,19 +69,29 @@ const { channels } = Astro.props;
 </style>
 
 <script>
-  const buttons = document.querySelectorAll('.channel-btn');
-  const iframe = document.getElementById('match-player') as HTMLIFrameElement;
+  function setupChannelButtons() {
+    const buttons = document.querySelectorAll('.channel-btn');
+    const iframe = document.getElementById('match-player') as HTMLIFrameElement;
 
-  buttons.forEach(button => {
-    button.addEventListener('click', () => {
-      const url = button.getAttribute('data-url');
-      if (url && iframe) {
-        iframe.src = url;
-        
-        // Update active state
-        buttons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-      }
+    if (!iframe) return;
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const url = button.getAttribute('data-url');
+        if (url) {
+          iframe.src = url;
+          
+          // Update active state
+          buttons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+        }
+      });
     });
-  });
+  }
+
+  // Run on page load
+  setupChannelButtons();
+
+  // Run on view transitions if enabled
+  document.addEventListener('astro:after-swap', setupChannelButtons);
 </script>
