@@ -57,7 +57,7 @@ const matchSchema = {
   description={`Ver ${match.title} en vivo gratis. Stream online de ${match.competition}. Disfruta del partido sin cortes.`}
   matchSchema={matchSchema}
 >
-  <div class="container">
+  <div class="match-page-container">
     <div class="match-page-header">
       <h2 class="match-title">
         <span class="live-indicator">EN VIVO</span> 
@@ -95,97 +95,137 @@ const matchSchema = {
       </p>
       <div class="embed-code">
         <label>Código para insertar:</label>
-        <textarea readonly>{`<iframe src="${currentUrl}" width="100%" height="500" frameborder="0"></iframe>`}</textarea>
+        <div class="textarea-wrapper">
+          <textarea readonly>{`<iframe src="${currentUrl}" width="100%" height="500" frameborder="0"></iframe>`}</textarea>
+        </div>
       </div>
     </div>
   </div>
 </BaseLayout>
 
 <style>
+  .match-page-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
   .match-page-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     text-align: center;
+    background: #111;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--primary-red);
   }
 
   .match-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--white);
     margin-bottom: 0.5rem;
+    line-height: 1.2;
   }
 
   .live-indicator {
     background: var(--primary-red);
     color: white;
-    padding: 2px 8px;
-    font-size: 0.8rem;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 900;
     border-radius: 3px;
     vertical-align: middle;
     margin-right: 10px;
     animation: blink 1.5s infinite;
+    display: inline-block;
   }
 
   @keyframes blink {
     0% { opacity: 1; }
-    50% { opacity: 0.5; }
+    50% { opacity: 0.4; }
     100% { opacity: 1; }
   }
 
   .match-meta {
-    color: #aaa;
-    font-size: 1.1rem;
+    color: #888;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
   }
 
   .player-section {
-    margin-bottom: 1.5rem;
-    border-radius: 8px;
-    overflow: hidden;
+    margin-bottom: 2rem;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 
   .notice-bar {
     background: #fff3cd;
     color: #856404;
-    padding: 0.8rem;
-    font-size: 0.9rem;
+    padding: 1rem;
+    font-size: 0.85rem;
     text-align: center;
     border-top: 1px solid #ffeeba;
+    font-weight: 600;
   }
 
   .seo-content {
-    padding: 1.5rem;
-    color: #333;
-    margin-top: 2rem;
+    padding: 2rem;
+    color: var(--text-dark);
+    line-height: 1.7;
+    margin-top: 3rem;
   }
 
   .seo-content h3 {
     margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 800;
     color: var(--primary-red);
+    text-transform: uppercase;
   }
 
   .embed-code {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
   }
 
   .embed-code label {
     display: block;
     font-size: 0.8rem;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
+    margin-bottom: 0.75rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .textarea-wrapper {
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: var(--radius);
+    border: 1px solid #ddd;
   }
 
   .embed-code textarea {
     width: 100%;
-    height: 60px;
-    padding: 10px;
-    background: #f4f4f4;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-family: monospace;
+    height: 70px;
+    background: transparent;
+    border: none;
+    font-family: 'Courier New', Courier, monospace;
     font-size: 0.8rem;
+    color: #555;
     resize: none;
+    outline: none;
   }
 
   @media (max-width: 600px) {
     .match-title {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
+    }
+    .match-page-header {
+      padding: 1rem;
+    }
+    .seo-content {
+      padding: 1.5rem;
     }
   }
 </style>

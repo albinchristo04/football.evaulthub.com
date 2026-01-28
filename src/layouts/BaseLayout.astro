@@ -66,24 +66,33 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <header>
-      <a href="/">
-        <h1>football.evaulthub.com</h1>
-      </a>
-    </header>
-    <nav class="categories">
-      <div class="container">
-        <a href="/">Fútbol</a>
-        <a href="/">Baloncesto</a>
-        <a href="/">Tenis</a>
-        <a href="/">MotoGP</a>
-        <a href="/">F1</a>
+      <div class="header-container">
+        <a href="/" class="logo">
+          football<span>.evaulthub.com</span>
+        </a>
+        <div class="nav-scroll">
+          <nav class="nav-links">
+            <a href="/" class="active">Fútbol</a>
+            <a href="/">Baloncesto</a>
+            <a href="/">Tenis</a>
+            <a href="/">En Vivo</a>
+            <a href="/">Programación</a>
+          </nav>
+        </div>
       </div>
-    </nav>
-    <main>
+    </header>
+
+    <main class="main-content">
       <slot />
     </main>
-    <footer style="text-align: center; padding: 2rem; color: #666; font-size: 0.8rem;">
-      <p>&copy; {new Date().getFullYear()} football.evaulthub.com - Agenda deportiva en vivo</p>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/">DMCA</a>
+        <a href="/">Contact</a>
+        <a href="/">Privacy</a>
+      </div>
+      <p class="copyright">&copy; {new Date().getFullYear()} football.evaulthub.com - Todos los derechos reservados.</p>
     </footer>
   </body>
 </html>

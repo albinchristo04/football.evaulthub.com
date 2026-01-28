@@ -32,31 +32,52 @@ const sortedDates = Object.keys(groupedMatches).sort((a, b) => {
 ---
 
 <BaseLayout title="Inicio">
-  <div class="container">
-    <h2 class="section-title">PROGRAMACIÓN DE HOY EN VIVO</h2>
-    
-    <div class="match-list">
-      {sortedDates.map(date => (
-        <div class="date-group">
-          <div class="date-header">{date}</div>
-          {groupedMatches[date].map((match: any) => (
-            <MatchCard match={match} />
-          ))}
-        </div>
-      ))}
-    </div>
+  <div class="page-title-bar">
+    <span>⚽</span> PROGRAMACIÓN DE HOY EN VIVO
+  </div>
+  
+  <div class="match-list">
+    {sortedDates.map(date => (
+      <div class="date-group">
+        <div class="date-header">{date}</div>
+        {groupedMatches[date].map((match: any) => (
+          <MatchCard match={match} />
+        ))}
+      </div>
+    ))}
+  </div>
+
+  <div class="pagination-mock">
+    <button class="btn btn-outline">Cargar más partidos</button>
   </div>
 </BaseLayout>
 
 <style>
   .date-header {
-    background: #333;
-    color: #fff;
+    background: #222;
+    color: #eee;
     padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin: 1rem 0 0.5rem 0;
-    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.5rem 0;
+    border-radius: var(--radius);
     text-transform: uppercase;
+  }
+
+  .pagination-mock {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary-red);
+    color: var(--primary-red);
+  }
+
+  .btn-outline:hover {
+    background: var(--primary-red);
+    color: white;
   }
 </style>

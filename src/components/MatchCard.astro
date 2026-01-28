@@ -16,22 +16,28 @@ const slug = slugify(`${match.competition}-${match.title}`);
 
 <div class="match-card card">
   <div class="match-header">
-    <span class="match-time">{match.time}</span>
-    <span class="match-icon">⚽</span>
-    <span class="match-name">{match.title}</span>
-    <span class="expand-indicator">VER CANALES »</span>
+    <div class="match-info">
+      <span class="match-time">{match.time}</span>
+      <span class="match-icon">⚽</span>
+      <span class="match-name">{match.title}</span>
+    </div>
+    <div class="match-action">
+      <span class="expand-btn">VER CANALES »</span>
+    </div>
   </div>
   <div class="match-content" style="display: none;">
-    <p class="competition-label">{match.competition}</p>
-    <div class="channel-grid">
-      {match.channels.map(channel => (
-        <a href={`/partido/${slug}/`} class="btn channel-link">
-          {channel.name}
-        </a>
-      ))}
-    </div>
-    <div class="match-page-link">
-      <a href={`/partido/${slug}/`}>PÁGINA DEL PARTIDO</a>
+    <div class="content-inner">
+      <p class="competition-label">{match.competition}</p>
+      <div class="channel-grid">
+        {match.channels.map(channel => (
+          <a href={`/partido/${slug}/`} class="btn channel-link">
+            {channel.name}
+          </a>
+        ))}
+      </div>
+      <div class="match-page-link">
+        <a href={`/partido/${slug}/`} class="full-page-btn">PÁGINA DEL PARTIDO</a>
+      </div>
     </div>
   </div>
 </div>
@@ -39,72 +45,124 @@ const slug = slugify(`${match.competition}-${match.title}`);
 <style>
   .match-card {
     cursor: pointer;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+
+  .match-card:hover {
+    background: #fafafa;
   }
 
   .match-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0.8rem;
-    gap: 10px;
-    background: #fdfdfd;
+    padding: 0.75rem 1rem;
+    gap: 1rem;
+  }
+
+  .match-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
   }
 
   .match-time {
-    font-weight: bold;
+    font-weight: 800;
     color: var(--primary-red);
-    min-width: 50px;
+    font-size: 0.9rem;
+    width: 45px;
   }
 
   .match-name {
-    flex-grow: 1;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .expand-indicator {
-    font-size: 0.8rem;
-    color: #888;
+  .expand-btn {
+    background: #f0f0f0;
+    color: #444;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .match-card.open .expand-btn {
+    background: var(--primary-red);
+    color: white;
   }
 
   .match-content {
+    background: #f9f9f9;
+    border-top: 1px solid var(--border);
+  }
+
+  .content-inner {
     padding: 1rem;
-    background: #fff;
-    border-top: 1px solid #eee;
   }
 
   .competition-label {
-    font-size: 0.85rem;
-    color: #666;
-    margin-bottom: 0.8rem;
-    font-weight: bold;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
     text-transform: uppercase;
   }
 
   .channel-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 1rem;
+    gap: 6px;
+    margin-bottom: 1.25rem;
   }
 
   .channel-link {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   }
 
-  .match-page-link {
-    text-align: right;
+  .full-page-btn {
+    display: block;
+    text-align: center;
+    padding: 0.5rem;
+    background: #eee;
+    color: #666;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border-radius: 3px;
+    text-transform: uppercase;
   }
 
-  .match-page-link a {
-    font-size: 0.8rem;
-    color: var(--primary-red);
-    font-weight: bold;
-    text-decoration: underline;
+  .full-page-btn:hover {
+    background: #ddd;
+    color: #333;
   }
 
-  .match-card.open .expand-indicator {
-    transform: rotate(90deg);
+  @media (max-width: 480px) {
+    .match-header {
+      padding: 0.6rem 0.75rem;
+    }
+    .match-time {
+      width: 40px;
+      font-size: 0.8rem;
+    }
+    .match-name {
+      font-size: 0.85rem;
+    }
+    .expand-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
+    }
   }
 </style>
 
