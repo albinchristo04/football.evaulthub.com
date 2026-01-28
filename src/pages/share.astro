@@ -62,36 +62,50 @@ const groupedByServer = {
       <span>🔗</span> GENERADOR DE ENLACES PARA TELEGRAM
     </div>
 
-    <div class="server-selection">
-      {Object.keys(groupedByServer).map(server => (
-        <div class="server-block">
-          <h2 class="server-header">{server}</h2>
-          <div class="match-grid">
-            {groupedByServer[server].map(match => (
-              <div class="share-card card">
-                <div class="match-info">
-                  <span class="match-time">{match.time}</span>
-                  <span class="match-title">{match.title}</span>
-                </div>
-                <div class="share-actions">
-                  <button 
-                    class="btn btn-copy" 
-                    data-text={`⚽ VER EN VIVO:
-${match.title}
+    <div class="server-tabs">
+      <button class="tab-btn active" data-server="Server 1">Servidor 1</button>
+      <button class="tab-btn" data-server="Server 2">Servidor 2</button>
+      <button class="tab-btn" data-server="Server 3">Servidor 3</button>
+    </div>
 
-⏰ Horario: ${match.time}
+    <div class="server-content">
+      {Object.keys(groupedByServer).map((server, sIdx) => {
+        const serverMatches = groupedByServer[server];
+        const shareText = `🚀 PROGRAMACIÓN DE HOY - ${server}\n\n` + 
+          serverMatches.map(m => `⚽ ${m.title}
+⏰ ${m.time}
+📺 https://football.evaulthub.com/partido/${m.slug}/
+-----------------------`).join('
 
-📺 Mira el partido aquí 👇
-https://football.evaulthub.com/partido/${match.slug}/`}
-                  >
-                    COPIAR PARA TELEGRAM
-                  </button>
+');
+        
+        return (
+          <div class="server-block" data-server={server} style={sIdx === 0 ? 'display: block;' : 'display: none;'}>
+            <div class="copy-all-container">
+              <button 
+                class="btn btn-copy-all" 
+                data-text={shareText}
+              >
+                📋 COPIAR TODO (${server}) PARA TELEGRAM
+              </button>
+            </div>
+
+            <div class="match-grid">
+              {serverMatches.map(match => (
+                <div class="share-card card">
+                  <div class="match-info">
+                    <span class="match-time">{match.time}</span>
+                    <span class="match-title">{match.title}</span>
+                  </div>
+                  <div class="match-link-display">
+                    <code>/partido/{match.slug}/</code>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   </div>
 </BaseLayout>
@@ -102,20 +116,53 @@ https://football.evaulthub.com/partido/${match.slug}/`}
     margin: 0 auto;
   }
 
-  .server-header {
-    background: var(--primary-red);
-    color: white;
-    padding: 0.5rem 1rem;
-    font-size: 1.1rem;
+  .server-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 1.5rem;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #888;
+    border-radius: 25px;
+    font-size: 0.85rem;
     font-weight: 800;
-    margin: 2rem 0 1rem 0;
-    border-radius: var(--radius);
-    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .tab-btn.active {
+    background: var(--primary-red);
+    border-color: var(--primary-red);
+    color: white;
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+  }
+
+  .copy-all-container {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .btn-copy-all {
+    width: 100%;
+    max-width: 500px;
+    padding: 1rem;
+    font-size: 1rem;
+    background: #25d366; /* Telegram green style */
+    border-radius: 8px;
+  }
+
+  .btn-copy-all:hover {
+    background: #128c7e;
   }
 
   .match-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
   }
 
@@ -123,15 +170,8 @@ https://football.evaulthub.com/partido/${match.slug}/`}
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: 0.75rem;
     border: 1px solid #eee;
-  }
-
-  .match-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
   }
 
   .match-time {
@@ -142,37 +182,63 @@ https://football.evaulthub.com/partido/${match.slug}/`}
 
   .match-title {
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-dark);
   }
 
-  .btn-copy {
-    width: 100%;
-    font-size: 0.75rem;
-    padding: 0.6rem;
+  .match-link-display {
+    font-size: 0.7rem;
+    color: #999;
+    word-break: break-all;
+    background: #f9f9f9;
+    padding: 4px;
+    border-radius: 3px;
   }
 
   @media (max-width: 600px) {
     .match-grid {
       grid-template-columns: 1fr;
     }
+    .server-tabs {
+      flex-wrap: wrap;
+    }
   }
 </style>
 
 <script>
-  function setupCopyButtons() {
-    const buttons = document.querySelectorAll('.btn-copy');
-    buttons.forEach(button => {
+  function setupSharePage() {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const blocks = document.querySelectorAll('.server-block');
+    const copyBtns = document.querySelectorAll('.btn-copy-all');
+
+    // Tab Logic
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const server = tab.getAttribute('data-server');
+        
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        blocks.forEach(block => {
+          if (block.getAttribute('data-server') === server) {
+            (block as HTMLElement).style.display = 'block';
+          } else {
+            (block as HTMLElement).style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Copy Logic
+    copyBtns.forEach(button => {
       button.addEventListener('click', () => {
         const text = button.getAttribute('data-text');
         if (text) {
           navigator.clipboard.writeText(text).then(() => {
             const originalText = button.textContent;
-            button.textContent = '✅ ¡COPIADO!';
-            button.classList.add('success');
+            button.textContent = '✅ ¡MENSAJE COPIADO!';
             setTimeout(() => {
               button.textContent = originalText;
-              button.classList.remove('success');
             }, 2000);
           });
         }
@@ -180,6 +246,6 @@ https://football.evaulthub.com/partido/${match.slug}/`}
     });
   }
 
-  setupCopyButtons();
-  document.addEventListener('astro:after-swap', setupCopyButtons);
+  setupSharePage();
+  document.addEventListener('astro:after-swap', setupSharePage);
 </script>
